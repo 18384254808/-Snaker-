@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sys.dao.KhglDao">
+	<!-- 查询所有工程数据 -->
+	<select id="getkhgls" resultType="Khgl">
+	select * from khmc
+	</select>
+	<!-- 工程信息 -->
+	<resultMap id="gcmcVo" type="GcmcVo">
+		<id column="gcmc_id" property="gcmc_id"></id>
+		<result column="gcmc_name" property="gcmc_name"/>
+		<!-- 一对一关系 -->
+		<association property="khgl" javaType="Khgl">
+			<id column="khmc_id" property="khmc_id"></id>
+			<result column="khmc_name" property="khmc_name"/>
+		</association>
+	</resultMap>
+	<!-- 查询用户的工程信息 -->
+	<select id="getGcmcXX" resultMap="gcmcVo" >
+		SELECT g.gcmc_id,g.gcmc_name,k.khmc_id,k.khmc_name FROM gcmc g,khmc k 
+		WHERE g.khmc_id = k.khmc_id 
+		<if test='id != 0'>
+			AND k.khmc_id = #{id}
+		</if>
+	</select>
+	<!-- 批量删除工程数据 -->
+	<delete id="deleteGcxxByids">
+	delete from gcmc where gcmc_id in
+	<foreach collection="ids" item="id" open="(" close=")" separator=",">
+		#{id}
+	</foreach>
+	</delete>
+	<!-- 新增工程信息 -->
+	<insert id="addGcxx" parameterType="Gcmc">
+	INSERT INTO gcmc(gcmc_name,khmc_id)VALUES(#{gcmc_name},#{khmc_id})
+	</insert>
+	
+<!-- 模糊 查询工程信息 -->
+	 <select id="getLikeGcxx" resultMap="gcmcVo">
+	SELECT g.gcmc_id,g.gcmc_name,k.khmc_id,k.khmc_name 
+	FROM gcmc g,khmc k 
+	WHERE g.khmc_id=k.khmc_id 
+	<if test="id!=0">
+	and  k.khmc_id=#{id}
+	</if>
+	<if test="key.equals('khmc')">
+	and k.khmc_name like concat('%',#{value},'%')
+	</if>
+	<if test="key.equals('gcmc')">
+	and g.gcmc_name like concat('%',#{value},'%')
+	</if>
+	<if test="key.equals('all')">
+	AND CONCAT(IFNULL(g.gcmc_name,''),IFNULL(k.khmc_name,'')) 
+	LIKE concat('%',#{value},'%')
+	</if>
+	</select> 
+	
+	<!-- 查找指定gcmc_id返回Gcmcxx -->
+	<select id="getGcmcVoByid" resultMap="gcmcVo">
+	SELECT g.gcmc_id,g.gcmc_name,k.khmc_id,k.khmc_name 
+	FROM gcmc g,khmc k 
+	WHERE g.khmc_id=k.khmc_id and g.gcmc_id=#{id}
+	</select>
+	
+	<!-- 修改指定gcmc_id信息 -->
+	<update id="updateByid">
+	UPDATE gcmc SET gcmc_name=#{gcmc_name},khmc_id=#{khmc_id} WHERE gcmc_id=#{id}
+	</update>
+	
+</mapper>
