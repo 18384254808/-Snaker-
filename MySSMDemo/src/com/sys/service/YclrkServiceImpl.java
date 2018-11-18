@@ -11,7 +11,6 @@ import com.sys.pojo.Yclrk;
 public class YclrkServiceImpl implements YclrkService {
 	@Autowired
 	private YclrkDao yclrkDao;
-	@Override
 	public List<Yclrk> getAllYcllrk() throws Exception {
 		return yclrkDao.getAllYcllrk();
 	}
